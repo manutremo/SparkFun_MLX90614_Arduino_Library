@@ -32,7 +32,7 @@ uint8_t IRTherm::begin(uint8_t address)
 {
 	_deviceAddress = address; // Store the address in a private member
 	
-	wake(); //try to wake it up in case it was asleep
+	wake(); 			//try to wake it up in case it was asleep, mod from pomplesiegel fork
  	delay(100);
 
 	//Wire.begin(); // Initialize I2C
@@ -287,7 +287,7 @@ uint8_t IRTherm::sleep(void)
 uint8_t IRTherm::wake(void)
 {
 	// Wake operation from datasheet. (Doesn't seem to be working.)
-	Wire.end();
+	Wire.end();						// Mod from rkaczorek fork (Manu 18 July 2019)
 	pinMode(SCL, INPUT); // SCL high
 	pinMode(SDA, OUTPUT);
 	digitalWrite(SDA, LOW); // SDA low
@@ -361,7 +361,7 @@ float IRTherm::calcTemperature(int16_t rawTemp)
 
 uint8_t IRTherm::I2CReadWord(byte reg, int16_t * dest)
 {
-	//int timeout = I2C_READ_TIMEOUT;
+	//int timeout = I2C_READ_TIMEOUT;				// Mod from Shymaa00 fork
 	
 	Wire.beginTransmission(_deviceAddress);
 	Wire.write(reg);
@@ -369,7 +369,7 @@ uint8_t IRTherm::I2CReadWord(byte reg, int16_t * dest)
 	Wire.endTransmission(false); // Send restart
 	Wire.requestFrom(_deviceAddress, (uint8_t) 3);
 	
-	/*while ((Wire.available() < 3) && (timeout-- > 0))
+	/*while ((Wire.available() < 3) && (timeout-- > 0))		// Mod from Shymaa00 fork
 		delay(1);
 	if (timeout <= 0)
 		return 0;*/
