@@ -32,10 +32,16 @@ uint8_t IRTherm::begin(uint8_t address)
 {
 	_deviceAddress = address; // Store the address in a private member
 	
-	Wire.begin(); // Initialize I2C
+	wake(); //try to wake it up in case it was asleep
+ 	delay(100);
+
+	//Wire.begin(); // Initialize I2C
+	
+	return readID() == 1; //if the sensor exists at this address, this command should return 1
+	
 	//! TODO: read a register, return success only if the register
 	//! produced a known-good value.
-	return 1; // Return success
+	//return 1; // Return success
 }
 
 void IRTherm::setUnit(temperature_units unit)
@@ -281,6 +287,7 @@ uint8_t IRTherm::sleep(void)
 uint8_t IRTherm::wake(void)
 {
 	// Wake operation from datasheet. (Doesn't seem to be working.)
+	Wire.end();
 	pinMode(SCL, INPUT); // SCL high
 	pinMode(SDA, OUTPUT);
 	digitalWrite(SDA, LOW); // SDA low
@@ -354,7 +361,7 @@ float IRTherm::calcTemperature(int16_t rawTemp)
 
 uint8_t IRTherm::I2CReadWord(byte reg, int16_t * dest)
 {
-	int timeout = I2C_READ_TIMEOUT;
+	//int timeout = I2C_READ_TIMEOUT;
 	
 	Wire.beginTransmission(_deviceAddress);
 	Wire.write(reg);
@@ -362,10 +369,10 @@ uint8_t IRTherm::I2CReadWord(byte reg, int16_t * dest)
 	Wire.endTransmission(false); // Send restart
 	Wire.requestFrom(_deviceAddress, (uint8_t) 3);
 	
-	while ((Wire.available() < 3) && (timeout-- > 0))
+	/*while ((Wire.available() < 3) && (timeout-- > 0))
 		delay(1);
 	if (timeout <= 0)
-		return 0;
+		return 0;*/
 	
 	uint8_t lsb = Wire.read();
 	uint8_t msb = Wire.read();
